@@ -1,1 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cornerstone — Real Estate Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0F1923;--ink2:#1E2D3D;--slate:#2C4159;
+  --amber:#D4923A;--amber-bg:#FDF6EC;
+  --bg:#F4F2EE;--card:#FFFFFF;--border:#DDD9D2;
+  --text:#1A1612;--muted:#6E6560;--hint:#A89F96;
+  --good:#166534;--good-bg:#F0FDF4;
+  --warn:#92400E;--warn-bg:#FFFBEB;
+  --bad:#991B1B;--bad-bg:#FEF2F2;
+  --info:#1E40AF;--info-bg:#EFF6FF;
+  --r:12px;--rs:8px;--rxs:6px;
+}
+body{font-family:'Karla',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100vh}
+.hdr{background:var(--ink);padding:11px 20px;padding-top:30px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;-webkit-app-region:drag}
+.brand{display:flex;align-items:center;gap:10px}
+.bmark{width:30px;height:30px;background:var(--amber);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.bmark svg{width:16px;height:16px;fill:var(--ink)}
+.bname{font-family:'Playfair Display',serif;color:white;font-size:16px}
+.btag{color:rgba(255,255,255,0.35);font-size:10px;font-weight:300;letter-spacing:0.06em;text-transform:uppercase}
+.hnav{display:flex;gap:2px;background:rgba(255,255,255,0.07);padding:3px;border-radius:7px;-webkit-app-region:no-drag}
+.hnav-btn{padding:5px 14px;border-radius:5px;font-size:12px;color:rgba(255,255,255,0.45);cursor:pointer;border:none;background:transparent;font-family:'Karla',sans-serif;font-weight:500;transition:all 0.2s;pointer-events:none}
+.hnav-btn.on{background:var(--amber);color:var(--ink);font-weight:700}
+.hnav-btn.live{pointer-events:auto;color:rgba(255,255,255,0.7)}
+.hnav-btn.live:hover:not(.on){background:rgba(255,255,255,0.1);color:white}
+.page{display:none;flex:1;flex-direction:column;overflow:hidden}
+.page.show{display:flex}
+.ob-wrap{flex:1;overflow-y:auto;background:var(--bg);padding:2rem 1rem;display:flex;flex-direction:column;align-items:center}
+.ob-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.25rem;max-width:600px;width:100%;box-shadow:0 2px 16px rgba(15,25,35,0.06);margin:auto}
+.pbar{height:3px;background:var(--border);border-radius:2px;margin-bottom:1.75rem;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--ink),var(--slate));border-radius:2px;transition:width 0.5s ease}
+.stag{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.qhead{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);margin-bottom:5px;line-height:1.35}
+.qsub{font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{border:1.5px solid var(--border);border-radius:var(--rs);padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;background:var(--card)}
+.opt:hover{border-color:var(--slate);background:#F7F9FC}
+.opt.on{border-color:var(--ink);background:#EEF3FF}
+.oico{width:32px;height:32px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.omain{font-size:13px;font-weight:600;color:var(--text)}
+.osub{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.4}
+.ob-textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);background:var(--bg);font-family:'Karla',sans-serif;resize:vertical;min-height:80px;outline:none;line-height:1.6;transition:border 0.2s;margin-bottom:8px}
+.ob-textarea:focus{border-color:var(--ink);background:white}
+.ob-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);background:var(--bg);font-family:'Karla',sans-serif;outline:none;transition:border 0.2s;margin-top:4px}
+.ob-input:focus{border-color:var(--ink);background:white}
+.insight-box{background:var(--amber-bg);border:1px solid #F0D9A8;border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--warn);line-height:1.6;margin-top:10px}
+.cta{width:100%;padding:11px;background:var(--ink);color:white;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;margin-top:1.25rem;font-family:'Karla',sans-serif;transition:background 0.2s}
+.cta:hover{background:var(--ink2)}
+.cta:disabled{background:var(--border);color:var(--hint);cursor:not-allowed}
+.main-layout{flex:1;display:grid;grid-template-columns:210px 1fr 340px;overflow:hidden}
+.sb{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-lbl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.08em}
+.sb-add{width:24px;height:24px;background:var(--ink);border:none;border-radius:5px;cursor:pointer;color:white;font-size:18px;display:flex;align-items:center;justify-content:center;font-family:'Karla',sans-serif}
+.sb-add:hover{background:var(--ink2)}
+.sb-scroll{flex:1;overflow-y:auto;padding:6px}
+.sb-empty{padding:16px 8px;font-size:11px;color:var(--hint);line-height:1.6;text-align:center}
+.sb-item{padding:9px 10px;border-radius:var(--rxs);cursor:pointer;margin:2px;transition:all 0.15s;border:1px solid transparent}
+.sb-item:hover{background:var(--bg);border-color:var(--border)}
+.sb-item.on{background:#EEF3FF;border-color:var(--slate)}
+.sb-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-meta{font-size:10px;color:var(--hint);margin-top:1px}
+.sb-cf{font-size:10px;font-weight:700;margin-top:2px}
+.sb-cf.good{color:var(--good)}.sb-cf.warn{color:var(--warn)}.sb-cf.bad{color:var(--bad)}
+.sb-foot{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-step-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.sb-step-name{font-size:11px;font-weight:600;color:var(--amber);margin-bottom:2px}
+.sb-step-tip{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:6px}
+.sb-step-btn{width:100%;padding:5px 10px;background:transparent;border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--muted);cursor:pointer;font-family:'Karla',sans-serif;transition:all 0.15s}
+.sb-step-btn:hover{border-color:var(--ink);color:var(--ink)}
+.chat-col{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}
+.chat-hdr{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.c-avi{width:32px;height:32px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.c-avi svg{width:15px;height:15px;fill:var(--amber)}
+.c-name{font-size:13px;font-weight:600;color:var(--text)}
+.c-status{font-size:10px;color:var(--good)}
+.c-pill{margin-left:auto;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.bw{display:flex;flex-direction:column;max-width:86%}
+.bw.me{align-self:flex-end;align-items:flex-end}
+.bw.ai{align-self:flex-start}
+.bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.65;white-space:pre-wrap}
+.bw.me .bubble{background:var(--ink);color:white;border-bottom-right-radius:3px}
+.bw.ai .bubble{background:var(--card);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px}
+.typing{background:var(--card);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:3px;padding:10px 14px;display:flex;gap:5px;align-items:center;width:fit-content}
+.td{width:6px;height:6px;border-radius:50%;background:var(--hint);animation:bop 1.3s ease-in-out infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{opacity:0.3;transform:scale(1)}30%{opacity:1;transform:scale(1.2)}}
+.chat-foot{padding:11px 16px;border-top:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+.sugs{display:flex;flex-wrap:wrap;gap:5px}
+.sug{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Karla',sans-serif;transition:all 0.15s;white-space:nowrap}
+.sug:hover{border-color:var(--slate);color:var(--slate);background:#F0F4FA}
+.irow{display:flex;gap:7px}
+.mi{flex:1;padding:9px 14px;border:1.5px solid var(--border);border-radius:22px;font-size:13px;color:var(--text);background:var(--card);font-family:'Karla',sans-serif;outline:none;transition:border 0.2s}
+.mi:focus{border-color:var(--ink)}
+.sbtn{width:36px;height:36px;background:var(--ink);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sbtn:hover{background:var(--ink2)}
+.sbtn svg{width:13px;height:13px;fill:white;margin-left:2px}
+.az{display:flex;flex-direction:column;overflow:hidden;background:var(--card)}
+.az-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.az-title{font-size:13px;font-weight:600;color:var(--text)}
+.az-sub{font-size:10px;color:var(--muted)}
+.az-tabs{display:flex;gap:2px;background:var(--bg);padding:2px;border-radius:6px}
+.az-tab{padding:4px 10px;border-radius:5px;font-size:11px;color:var(--muted);cursor:pointer;border:none;background:transparent;font-family:'Karla',sans-serif;font-weight:500;transition:all 0.15s}
+.az-tab.on{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.az-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.flbl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fld{display:flex;flex-direction:column;gap:2px}
+.fld label{font-size:10px;color:var(--muted)}
+.fld input{padding:7px 9px;border:1.5px solid var(--border);border-radius:var(--rxs);font-size:12px;color:var(--text);background:var(--bg);width:100%;font-family:'Karla',sans-serif;outline:none;transition:border 0.2s}
+.fld input:focus{border-color:var(--ink);background:white}
+.azbtn{width:100%;padding:10px;background:var(--ink);color:white;border:none;border-radius:var(--rxs);font-size:12px;font-weight:700;cursor:pointer;font-family:'Karla',sans-serif;transition:background 0.2s;margin-top:4px}
+.azbtn:hover{background:var(--ink2)}
+.azbtn:disabled{background:var(--border);color:var(--hint);cursor:not-allowed}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.metric{border-radius:var(--rxs);padding:9px 11px}
+.metric.good{background:var(--good-bg)}.metric.warn{background:var(--warn-bg)}.metric.bad{background:var(--bad-bg)}.metric.neu{background:var(--bg)}
+.mlbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;font-weight:600}
+.mval{font-size:15px;font-weight:700}
+.mval.good{color:var(--good)}.mval.warn{color:var(--warn)}.mval.bad{color:var(--bad)}.mval.neu{color:var(--text)}
+.tier-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.tier-badge.strong{background:var(--good-bg);color:var(--good)}
+.tier-badge.maybe{background:var(--warn-bg);color:var(--warn)}
+.tier-badge.weak{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.tier-badge.pass{background:var(--bad-bg);color:var(--bad)}
+.reasons{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.reason{font-size:11px;line-height:1.5;display:flex;gap:6px;color:var(--text)}
+.rdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.rdot.pro{background:var(--good)}.rdot.con{background:var(--bad)}
+.next-steps{background:var(--info-bg);border:1px solid #BFDBFE;border-radius:var(--rxs);padding:10px 12px}
+.ns-lbl{font-size:9px;font-weight:700;color:var(--info);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px}
+.ns-item{font-size:11px;color:var(--info);line-height:1.5;display:flex;gap:6px;margin-bottom:3px}
+.divider{height:1px;background:var(--border)}
+.rm-page{flex:1;overflow-y:auto;padding:2rem;background:var(--bg)}
+.rm-grid{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.rm-intro h1{font-family:'Playfair Display',serif;font-size:24px;color:var(--ink);margin-bottom:4px}
+.rm-intro p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.rm-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;display:flex;gap:1rem;transition:all 0.2s}
+.rm-card.active-step{border-color:var(--amber);box-shadow:0 0 0 2px rgba(212,146,58,0.15)}
+.rm-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.rm-num.done{background:var(--good);color:white}
+.rm-num.active{background:var(--amber);color:var(--ink)}
+.rm-num.locked{background:var(--bg);color:var(--hint);border:1.5px solid var(--border)}
+.rm-body{flex:1}
+.rm-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rm-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.rm-tips{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.rm-tip{font-size:11px;color:var(--text);line-height:1.5;display:flex;gap:6px}
+.rm-tip::before{content:'→';color:var(--amber);flex-shrink:0}
+.rm-btn{padding:6px 16px;background:transparent;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Karla',sans-serif;font-weight:500;transition:all 0.15s}
+.rm-btn:hover{border-color:var(--ink);color:var(--ink)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,25,35,0.45);z-index:99}
+.overlay.show{display:block}
+.modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;width:380px;box-shadow:0 8px 40px rgba(15,25,35,0.18);z-index:100}
+.modal.show{display:block}
+.modal h2{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink);margin-bottom:5px}
+.modal p{font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+.modal-inp{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:'Karla',sans-serif;outline:none;background:var(--bg);transition:border 0.2s}
+.modal-inp:focus{border-color:var(--ink);background:white}
+.modal-btns{display:flex;gap:8px;margin-top:1rem}
+.m-cancel{flex:1;padding:9px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);font-size:12px;cursor:pointer;font-family:'Karla',sans-serif;color:var(--muted);font-weight:500}
+.m-ok{flex:2;padding:9px;background:var(--ink);color:white;border:none;border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;font-family:'Karla',sans-serif}
+.m-ok:hover{background:var(--ink2)}
+.setup-screen{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:2rem}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem;max-width:500px;width:100%;box-shadow:0 2px 20px rgba(15,25,35,0.07)}
+.setup-card h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--ink);margin-bottom:8px}
+.setup-card p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem}
+.setup-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:1.5rem}
+.setup-step{display:flex;gap:12px;align-items:flex-start}
+.snum{width:24px;height:24px;border-radius:50%;background:var(--ink);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.stext{font-size:13px;color:var(--text);line-height:1.6}
+.stext code{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
+.key-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text);font-family:monospace;outline:none;background:var(--bg);transition:border 0.2s;margin-bottom:10px}
+.key-input:focus{border-color:var(--ink);background:white}
+.key-btn{width:100%;padding:12px;background:var(--ink);color:white;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;font-family:'Karla',sans-serif;transition:background 0.2s}
+.key-btn:hover{background:var(--ink2)}
+.key-note{font-size:11px;color:var(--hint);margin-top:8px;line-height:1.6;text-align:center}
+.err-box{background:var(--bad-bg);border:1px solid #FECACA;border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--bad);line-height:1.6;margin-top:10px;display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="brand">
+    <div class="bmark"><svg viewBox="0 0 20 20"><path d="M10 1L2 6.5V19h5.5v-6h5v6H18V6.5L10 1z"/></svg></div>
+    <div><div class="bname">Cornerstone</div><div class="btag">Real Estate Coach</div></div>
+  </div>
+  <div class="hnav">
+    <button class="hnav-btn on" id="n-coach" onclick="showPage('coach')">Coach</button>
+    <button class="hnav-btn" id="n-roadmap" onclick="showPage('roadmap')">Roadmap</button>
+    <button class="hnav-btn" id="n-analyzer" onclick="showPage('analyzer')">Analyzer</button>
+  </div>
+</div>
 
+<div class="page show" id="pg-setup">
+  <div class="setup-screen">
+    <div class="setup-card">
+      <h1>One quick setup step</h1>
+      <p>Cornerstone needs a free API key to power the AI coaching. You only do this once — it saves permanently on your computer.</p>
+      <div class="setup-steps">
+        <div class="setup-step"><div class="snum">1</div><div class="stext">Go to <strong>platform.anthropic.com</strong> and create a free account</div></div>
+        <div class="setup-step"><div class="snum">2</div><div class="stext">Click <strong>API Keys</strong> in the left menu, then <strong>Create Key</strong></div></div>
+        <div class="setup-step"><div class="snum">3</div><div class="stext">Copy the key — it starts with <code>sk-ant-</code> — and paste it below</div></div>
+      </div>
+      <input class="key-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveKey()"/>
+      <button class="key-btn" onclick="saveKey()">Start Cornerstone →</button>
+      <div class="err-box" id="key-err"></div>
+      <div class="key-note">Your key never leaves your computer. It is stored locally and used only to talk to Anthropic's servers.</div>
+      <div style="margin-top:16px;text-align:center"><button onclick="clearAllData()" style="background:none;border:none;font-size:11px;color:var(--hint);cursor:pointer;text-decoration:underline;font-family:Karla,sans-serif">Reset app / clear all data</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="pg-ob">
+  <div class="ob-wrap">
+    <div class="ob-card">
+      <div class="pbar"><div class="pfill" id="pfill" style="width:14%"></div></div>
+      <div id="qblock"></div>
+      <button class="cta" id="next-btn" onclick="nextQ()" disabled>Continue →</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="pg-main">
+  <div class="main-layout">
+    <div class="sb">
+      <div class="sb-hdr"><span class="sb-lbl">My Deals</span><button class="sb-add" onclick="openModal()">+</button></div>
+      <div class="sb-scroll"><div id="sb-list"><div class="sb-empty">No deals yet.<br>Click + to add one.</div></div></div>
+      <div class="sb-foot" id="sb-foot"></div>
+    </div>
+    <div class="chat-col">
+      <div class="chat-hdr">
+        <div class="c-avi"><svg viewBox="0 0 20 20"><path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0H3z"/></svg></div>
+        <div><div class="c-name">Your RE Coach</div><div class="c-status">● Active now</div></div>
+        <div class="c-pill" id="c-pill"></div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="chat-foot">
+        <div class="sugs" id="sugs"></div>
+        <div class="irow">
+          <input class="mi" id="mi" type="text" placeholder="Ask anything — deals, financing, fear, strategy..." onkeydown="if(event.key==='Enter')send()"/>
+          <button class="sbtn" onclick="send()"><svg viewBox="0 0 16 16"><path d="M2 8L14 2l-4 6 4 6z"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="az">
+      <div class="az-hdr">
+        <div><div class="az-title" id="az-title">Deal Analyzer</div><div class="az-sub" id="az-sub">Add a deal to get started</div></div>
+        <div class="az-tabs">
+          <button class="az-tab on" onclick="azTab('basic',this)">Basic</button>
+          <button class="az-tab" onclick="azTab('brrrr',this)">BRRRR</button>
+        </div>
+      </div>
+      <div class="az-body">
+        <div id="az-basic">
+          <div class="flbl">Property Details</div>
+          <div class="fg">
+            <div class="fld"><label>Purchase price ($)</label><input type="number" id="price" value="350000"/></div>
+            <div class="fld"><label>Down payment (%)</label><input type="number" id="dpct" value="20"/></div>
+            <div class="fld"><label>Interest rate (%)</label><input type="number" id="irate" value="7.0" step="0.1"/></div>
+            <div class="fld"><label>Loan term (yrs)</label><input type="number" id="term" value="30"/></div>
+            <div class="fld"><label>Monthly rent ($)</label><input type="number" id="rent" value="2800"/></div>
+            <div class="fld"><label>Vacancy (%)</label><input type="number" id="vac" value="8"/></div>
+            <div class="fld"><label>Annual tax ($)</label><input type="number" id="tax" value="4200"/></div>
+            <div class="fld"><label>Insurance/mo ($)</label><input type="number" id="ins" value="120"/></div>
+            <div class="fld"><label>Maintenance/mo ($)</label><input type="number" id="maint" value="200"/></div>
+            <div class="fld"><label>Mgmt fee (%)</label><input type="number" id="mgmt" value="8"/></div>
+          </div>
+        </div>
+        <div id="az-brrrr" style="display:none">
+          <div class="flbl">BRRRR / Rehab</div>
+          <div class="fg">
+            <div class="fld"><label>Purchase price ($)</label><input type="number" id="b-price" value="180000"/></div>
+            <div class="fld"><label>Rehab budget ($)</label><input type="number" id="rehab" value="40000"/></div>
+            <div class="fld"><label>After repair value ($)</label><input type="number" id="arv" value="280000"/></div>
+            <div class="fld"><label>Refi LTV (%)</label><input type="number" id="ltv" value="75"/></div>
+            <div class="fld"><label>Refi rate (%)</label><input type="number" id="refi-rate" value="7.0" step="0.1"/></div>
+            <div class="fld"><label>Monthly rent ($)</label><input type="number" id="b-rent" value="2000"/></div>
+            <div class="fld"><label>Monthly expenses ($)</label><input type="number" id="b-exp" value="700"/></div>
+            <div class="fld"><label>Months to complete</label><input type="number" id="b-months" value="4"/></div>
+          </div>
+        </div>
+        <button class="azbtn" id="azbtn" onclick="runAnalysis()">Analyze This Deal →</button>
+        <div id="az-results" style="display:none;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="pg-roadmap">
+  <div class="rm-page"><div class="rm-grid" id="rm-grid"></div></div>
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+  <h2>Add a new deal</h2>
+  <p>Enter the property address. This becomes the name of your saved deal and keeps all your notes and chat history organized by property.</p>
+  <input class="modal-inp" id="addr-inp" type="text" placeholder="e.g. 47 Elm Street, Newark NJ" onkeydown="if(event.key==='Enter')confirmDeal()"/>
+  <div class="modal-btns">
+    <button class="m-cancel" onclick="closeModal()">Cancel</button>
+    <button class="m-ok" onclick="confirmDeal()">Create Deal →</button>
+  </div>
+</div>
+
+<script>
+let API_KEY='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',ans={},qIdx=0,deals={},activeDeal=null,chatHistory=[],sysPrompt='',azMode='basic',roadmapStep=0;
+
+const OB=[
+  {id:'stage',step:'1 of 7',pct:14,head:'Where are you right now?',sub:"Real estate has peaked your interest. Let's find out exactly where you're starting so your coach gives you the right guidance — not generic advice.",type:'choice',opts:[
+    {e:'👀',t:'Just exploring',d:"Curious but haven't done anything yet"},
+    {e:'📚',t:'Actively learning',d:"Educating myself but haven't pulled the trigger"},
+    {e:'🔑',t:'Ready to buy',d:'Looking at deals, want to move soon'},
+    {e:'🏠',t:'Already an investor',d:'Own 1–2 properties, want to grow'}
+  ]},
+  {id:'goal',step:'2 of 7',pct:28,head:'What does winning look like for you?',sub:"A deal perfect for one person is wrong for another. Your coach needs to know what you're actually trying to accomplish.",type:'choice',opts:[
+    {e:'💵',t:'Monthly cash flow',d:'Extra money in my pocket every single month'},
+    {e:'📈',t:'Long-term wealth',d:'Build equity and net worth over time'},
+    {e:'🏡',t:'Get my first property',d:'Own my first investment and learn as I go'},
+    {e:'⚡',t:'Build a portfolio',d:'Scale to multiple properties quickly'}
+  ]},
+  {id:'budget',step:'3 of 7',pct:42,head:"What are you comfortable spending?",sub:"This isn't about what you can technically afford — it's about what lets you sleep at night.",type:'choice',opts:[
+    {e:'🌱',t:'Under $50K down',d:'Starting lean, want to preserve cash'},
+    {e:'💼',t:'$50K – $100K down',d:'Have some capital, want to be smart'},
+    {e:'🏦',t:'$100K – $200K down',d:'Ready to move on a solid deal'},
+    {e:'💎',t:'$200K+ down',d:'Capital is not the constraint'}
+  ]},
+  {id:'strategy',step:'4 of 7',pct:57,head:"What strategy are you drawn to?",sub:"Don't worry if you're not sure — your coach will help. Just pick what resonates most.",type:'choice',opts:[
+    {e:'🏘️',t:'Buy and hold rental',d:'Own it, rent it, collect monthly income'},
+    {e:'🏠',t:'House hacking',d:'Live in one unit, rent the others'},
+    {e:'🔨',t:'BRRRR',d:'Buy, rehab, rent, refinance, repeat'},
+    {e:'🌴',t:'Short-term rental',d:'Airbnb / VRBO strategy'}
+  ]},
+  {id:'blocker',step:'5 of 7',pct:71,head:"What's holding you back the most?",sub:"Be completely honest — your coach will focus here first.",type:'choice',opts:[
+    {e:'😰',t:'Fear of a mistake',d:"Analysis paralysis, can't pull the trigger"},
+    {e:'💰',t:'Money & financing',d:"Not sure I have enough or how to get a loan"},
+    {e:'🧭',t:"Don't know where to start",d:'The whole process feels overwhelming'},
+    {e:'🔍',t:'Finding a good deal',d:"Can't find anything that pencils out"}
+  ]},
+  {id:'vision',step:'6 of 7',pct:85,head:"Let's get real about what's at stake.",sub:"Your coach will use these answers to push you at the right moments. Write honestly.",type:'text',prompts:[
+    {id:'v-win',label:'What does your life look like in 3 years if this works out?'},
+    {id:'v-fail',label:'What happens to you if you never start?'},
+    {id:'v-hes',label:'What is your deepest hesitation right now? Put it on paper.'}
+  ]},
+  {id:'phone',step:'7 of 7',pct:100,head:'Daily coaching check-ins.',sub:"Your coach will send you a daily nudge to keep you moving — tied to your specific goals. What's your number?",type:'phone',note:'One check-in per day. Always tied to your goals and where you are in the process.'}
+];
+
+const ROADMAP=[
+  {title:'Analyze 10 deals',desc:'Before making any offer, run the numbers on at least 10 deals. You will develop an eye for what good looks like and stop second-guessing yourself.',tips:['Use the Analyzer tab for every property you find','Compare numbers across different areas and property types','You are training your eye, not searching for the perfect deal']},
+  {title:'Get pre-approved',desc:'Talk to 2–3 lenders before you need financing. Know your buying power, your rate range, and your DTI limit.',tips:['Ask about conventional, FHA, and DSCR loan options','Get the actual pre-approval letter — it makes offers stronger','Ask each lender: what would improve my rate?']},
+  {title:'Find an investor-friendly realtor',desc:"You need an agent who works with investors, not just homebuyers. The right realtor understands cash flow and investor math.",tips:['Ask them: how many investor clients do you work with?','A good investor agent spots problems before you do','They can pull rental comps and sold data for any area']},
+  {title:'Talk to a property manager',desc:'Before you buy, understand who will run the property. Property management is what makes this truly passive income.',tips:['Good PMs charge 8–12% of monthly rent — worth every penny','They handle tenants, maintenance, late rent, and evictions','Ask: what is your current vacancy rate and eviction process?']},
+  {title:'Make your first offer',desc:"You've analyzed deals, know your numbers, and have financing ready. Now it's time to make an actual offer.",tips:['Your first offer teaches you more than 10 YouTube videos','Always include contingencies: inspection, financing, appraisal','A low offer is not insulting — it is business']},
+  {title:'Under contract — due diligence',desc:'Once accepted, you have a window to inspect, verify numbers, and back out if needed. Use every day of it.',tips:['Hire a licensed inspector — never skip this','Verify actual rental income with leases or bank statements','Get contractor quotes for any repairs you spotted']},
+  {title:'Closing day',desc:'Final walkthrough, wire your funds, sign the documents. You are now a real estate investor.',tips:['Review the closing disclosure 3 days before — check every number','Closing costs are typically 2–5% of the loan amount','Day 1 after closing: insurance, utilities, meet your tenants']},
+  {title:'First 90 days post-close',desc:'The first 90 days set the tone. Get your systems in place and make this genuinely passive.',tips:['Open a separate bank account just for this property','Document everything: leases, insurance, mortgage statements','Review your actual numbers against what you analyzed']}
+];
+
+async function callClaude(messages, maxTokens=1000) {
+  const res = await fetch('http://127.0.0.1:3747/api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, system: sysPrompt, max_tokens: maxTokens })
+  });
+  if (!res.ok) throw new Error('Server error: ' + res.status);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'API error');
+  return data.content[0].text;
+}
+
+function saveKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  const err=document.getElementById('key-err');
+  if(!k||(!k.startsWith('sk-ant-')&&!k.startsWith('sk-'))){
+    err.style.display='block';err.textContent='That does not look right. Your key should start with sk-ant-';return;
+  }
+  API_KEY=k;
+  localStorage.setItem('cs_key',k);
+  err.style.display='none';
+  showPage('ob');renderQ();
+}
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.hnav-btn').forEach(b=>b.classList.remove('on'));
+  if(name==='setup')document.getElementById('pg-setup').classList.add('show');
+  else if(name==='ob')document.getElementById('pg-ob').classList.add('show');
+  else if(name==='coach'||name==='analyzer'){document.getElementById('pg-main').classList.add('show');document.getElementById('n-coach').classList.add('on');}
+  else if(name==='roadmap'){document.getElementById('pg-roadmap').classList.add('show');document.getElementById('n-roadmap').classList.add('on');renderRoadmap();}
+}
+
+function renderQ(){
+  const s=OB[qIdx];
+  document.getElementById('pfill').style.width=s.pct+'%';
+  let h=`<div class="stag">Step ${s.step}</div><div class="qhead">${s.head}</div><div class="qsub">${s.sub}</div>`;
+  if(s.type==='choice'){
+    h+=`<div class="opts">${s.opts.map((o,i)=>`<div class="opt" id="o${i}" onclick="pick(${i})"><div class="oico">${o.e}</div><div><div class="omain">${o.t}</div><div class="osub">${o.d}</div></div></div>`).join('')}</div>`;
+  }else if(s.type==='text'){
+    h+=`<div style="display:flex;flex-direction:column;gap:12px">${s.prompts.map(p=>`<div><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px">${p.label}</div><textarea class="ob-textarea" id="${p.id}" placeholder="Write your honest answer here..." oninput="checkText()"></textarea></div>`).join('')}</div>`;
+  }else if(s.type==='phone'){
+    h+=`<input class="ob-input" id="phone-inp" type="tel" placeholder="(732) 555-0100"/><div class="insight-box">Your coach checks in daily. If you have not analyzed a deal recently, you will hear about it. This is what separates people who buy from people who just talk about it.</div>`;
+  }
+  document.getElementById('qblock').innerHTML=h;
+  document.getElementById('next-btn').disabled=s.type==='choice';
+  if(s.type!=='choice')document.getElementById('next-btn').disabled=false;
+}
+
+function pick(i){
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('o'+i).classList.add('on');
+  ans[OB[qIdx].id]={idx:i,...OB[qIdx].opts[i]};
+  document.getElementById('next-btn').disabled=false;
+}
+
+function checkText(){OB[qIdx].prompts.forEach(p=>{ans[p.id]=(document.getElementById(p.id)?.value||'').trim();});}
+
+function nextQ(){
+  qIdx++;
+  if(qIdx>=OB.length)launch();
+  else renderQ();
+}
+
+function launch(){
+  localStorage.setItem('cs_profile',JSON.stringify(ans));
+  ['n-coach','n-roadmap','n-analyzer'].forEach(id=>document.getElementById(id).classList.add('live'));
+  document.getElementById('c-pill').textContent=`${ans.stage?.t||''} · ${ans.goal?.t||''} · ${ans.budget?.t||''}`;
+  sysPrompt=buildSystem();setSugs();renderSbFoot();loadDeals();showPage('coach');
+  const opening=buildOpening();
+  addMsg('ai',opening);chatHistory.push({role:'assistant',content:opening});
+}
+
+function buildSystem(){
+  const s=ans.stage?.t,g=ans.goal?.t,b=ans.budget?.t,st=ans.strategy?.t,bl=ans.blocker?.t;
+  const vWin=ans['v-win']||'',vHes=ans['v-hes']||'';
+  return `You are an expert real estate investing coach — direct, warm, and results-driven. You are a personal 1-on-1 coach who knows this person deeply and actively pushes them forward.
+
+USER PROFILE:
+Stage: ${s} | Goal: ${g} | Budget comfort: ${b} | Strategy: ${st} | Blocker: ${bl}
+Vision if it works: "${vWin}"
+Deepest hesitation: "${vHes}"
+
+COACHING RULES:
+1. Speak like a trusted mentor — warm but direct and honest
+2. Challenge bad assumptions gently. Separate emotion from financial reality.
+3. Ask one powerful follow-up question after most answers to keep momentum going
+4. Reference their specific profile often
+5. Never hype deals. Always default to conservative assumptions.
+6. When they share deal numbers give a structured verdict: STRONG / MAYBE / WEAK / PASS with top 3 pros and cons
+7. Keep responses 3-6 sentences unless they ask for detail
+8. End most responses with a clear next step or coaching question
+9. Help them define their buy box: area, price, property type, strategy, risk tolerance
+10. Build simple monthly action plans when asked
+11. Explain all jargon in plain English without being condescending
+12. Coach through hesitation and analysis paralysis — connect to their vision
+13. Help with scenario analysis: what if rent is lower, what if rates drop, what if rehab runs over
+14. One avoided bad deal is worth more than a year of subscriptions — be honest
+15. Explain property management benefits clearly — this is what makes real estate passive
+16. Help users think through offer strategy and negotiation when ready
+
+DEAL VERDICT FORMAT:
+VERDICT: [STRONG/MAYBE/WEAK/PASS]
+Why it works: 3 specific reasons
+Why it could fail: 3 specific risks
+Recommendation: one direct sentence
+Next step: one concrete action
+
+EXPERTISE: buy-and-hold, house hacking, BRRRR, STR, mid-term rental, flipping, conventional/FHA/DSCR/hard money financing, DTI, PMI, points, closing costs, cash flow, cap rate, cash-on-cash, GRM, DSCR, ARV, rehab budgets, NOI, break-even occupancy, inspection, appraisal, title, escrow, due diligence, offer strategy, negotiation, property management
+
+BLOCKER FOCUS:
+${bl==='Fear of a mistake'?'Address analysis paralysis head-on. Inaction is the real risk. Connect to their vision when they freeze.':''}
+${bl==='Money & financing'?'Explore realistic financing options. Ask about savings, income, credit. Show what is actually possible.':''}
+${bl==="Don't know where to start"?'Break everything into simple clear steps. Always end with THE one next action.':''}
+${bl==='Finding a good deal'?'Teach conservative underwriting. Explain what good looks like. Ask what markets they have been exploring.':''}`;
+}
+
+function buildOpening(){
+  const bl=ans.blocker?.t,vWin=ans['v-win']||'',vHes=ans['v-hes']||'';
+  if(bl==='Fear of a mistake')return `Alright — I read what you wrote. You said your deepest hesitation is: "${vHes.substring(0,90)}${vHes.length>90?'...':''}"\n\nHere is what I want you to hear: every successful investor I have ever seen had that exact same fear. The difference is they acted anyway. The ones who never bought? They still have that fear — plus years of lost time.\n\nYou wrote that if this works out, ${vWin.substring(0,100)}. Let us make that real.\n\nFirst question: have you ever actually run the numbers on a specific deal, or have you been avoiding that step?`;
+  if(bl==='Money & financing')return `Good — you know what you want. Let us cut through the money piece because that is what is stopping you.\n\nMost people dramatically overestimate how much they need to get started. FHA loans allow as little as 3.5% down. House hacking can get you in for even less.\n\nBefore I point you anywhere: give me the honest picture. Roughly how much do you have saved, what does your income look like, and what is your credit score ballpark?`;
+  if(bl==="Don't know where to start")return `You are in the right place. I have built you an 8-step roadmap from where you are right now to closing your first deal. Click Roadmap at the top anytime to see it.\n\nBut let us start here: you said "${vHes.substring(0,80)}${vHes.length>80?'...':''}". What specifically about that feels most stuck right now?`;
+  return `Good — you have experience and you know what you are after. The market has shifted and deals that pencil out at today's rates do exist — you just have to know what to look for.\n\nConservative underwriting is your edge right now. Most people are still using optimistic 2021 assumptions.\n\nTell me: what markets have you been looking in, and what has been wrong with the deals you have seen?`;
+}
+
+function setSugs(){
+  const bl=ans.blocker?.t;
+  const m={
+    'Fear of a mistake':['Walk me through analyzing my first deal','What if the property sits vacant?','How do I know when a deal is good enough?','What is the actual worst case scenario?'],
+    'Money & financing':['How much do I actually need to start?','Explain FHA loans in plain English','What is a DSCR loan?','Walk me through all my financing options'],
+    "Don't know where to start":['Show me the full roadmap','What should I do this month?','How do I pick a market?','What type of property should I buy first?'],
+    'Finding a good deal':['What makes a deal actually good?','Explain the 1% rule','What numbers should I be targeting?','How do I spot a red flag?']
+  };
+  const sugs=m[bl]||m['Fear of a mistake'];
+  document.getElementById('sugs').innerHTML=sugs.map(t=>`<button class="sug" onclick="doChat(${JSON.stringify(t)})">${t}</button>`).join('');
+}
+
+function renderRoadmap(){
+  document.getElementById('rm-grid').innerHTML=`
+    <div class="rm-intro"><h1>Your investing roadmap</h1><p>8 steps from where you are right now to closing your first deal. Your coach is available to help with every step.</p></div>
+    ${ROADMAP.map((r,i)=>`
+    <div class="rm-card${i===roadmapStep?' active-step':''}">
+      <div class="rm-num ${i<roadmapStep?'done':i===roadmapStep?'active':'locked'}">${i<roadmapStep?'✓':i+1}</div>
+      <div class="rm-body">
+        <div class="rm-title">${r.title}</div>
+        <div class="rm-desc">${r.desc}</div>
+        <div class="rm-tips">${r.tips.map(t=>`<div class="rm-tip">${t}</div>`).join('')}</div>
+        <button class="rm-btn" onclick="askStep(${i})">Ask my coach about this →</button>
+      </div>
+    </div>`).join('')}`;
+}
+
+function renderSbFoot(){
+  const r=ROADMAP[roadmapStep];
+  document.getElementById('sb-foot').innerHTML=`
+    <div class="sb-step-lbl">Current step</div>
+    <div class="sb-step-name">Step ${roadmapStep+1}: ${r.title}</div>
+    <div class="sb-step-tip">${r.tips[0]}</div>
+    <button class="sb-step-btn" onclick="askStep(${roadmapStep})">Ask coach →</button>`;
+}
+
+function askStep(i){
+  showPage('coach');
+  doChat(`Tell me everything I need to know about step ${i+1}: "${ROADMAP[i].title}". What should I actually do and what mistakes do people make here?`);
+}
+
+function loadDeals(){
+  try{const s=localStorage.getItem('cs_deals');if(s)deals=JSON.parse(s);}catch(e){}
+  renderSb();
+}
+
+function saveDeals(){try{localStorage.setItem('cs_deals',JSON.stringify(deals));}catch(e){}}
+
+function renderSb(){
+  const keys=Object.keys(deals);
+  if(!keys.length){document.getElementById('sb-list').innerHTML='<div class="sb-empty">No deals yet.<br>Click + to add one.</div>';return;}
+  document.getElementById('sb-list').innerHTML=keys.map(k=>{
+    const d=deals[k],cfCls=d.cf>200?'good':d.cf>0?'warn':'bad';
+    return `<div class="sb-item${activeDeal===k?' on':''}" onclick="selectDeal('${k}')">
+      <div class="sb-name">${d.address}</div>
+      <div class="sb-meta">${d.date||'Today'}</div>
+      ${d.cf!==undefined?`<div class="sb-cf ${cfCls}">$${Math.round(d.cf).toLocaleString()}/mo · ${d.tier||''}</div>`:'<div class="sb-meta">Not yet analyzed</div>'}
+    </div>`;
+  }).join('');
+}
+
+function openModal(){document.getElementById('overlay').classList.add('show');document.getElementById('modal').classList.add('show');setTimeout(()=>document.getElementById('addr-inp').focus(),50);}
+function closeModal(){document.getElementById('overlay').classList.remove('show');document.getElementById('modal').classList.remove('show');document.getElementById('addr-inp').value='';}
+
+function confirmDeal(){
+  const addr=document.getElementById('addr-inp').value.trim();
+  if(!addr)return;
+  const key='d'+Date.now();
+  deals[key]={address:addr,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),inputs:{},chat:[],cf:undefined,tier:undefined};
+  saveDeals();closeModal();renderSb();selectDeal(key);showPage('coach');
+}
+
+function selectDeal(key){
+  activeDeal=key;const d=deals[key];renderSb();
+  document.getElementById('az-title').textContent=d.address;
+  document.getElementById('az-sub').textContent='Enter numbers to analyze';
+  if(d.inputs?.price){['price','dpct','irate','term','rent','vac','tax','ins','maint','mgmt'].forEach(id=>{const el=document.getElementById(id);if(el&&d.inputs[id]!==undefined)el.value=d.inputs[id];});}
+  if(d.cf!==undefined)renderResults(d);
+  else document.getElementById('az-results').style.display='none';
+  document.getElementById('msgs').innerHTML='';chatHistory=[];
+  if(d.chat?.length){d.chat.forEach(m=>{addMsg(m.role,m.content,true);chatHistory.push(m);});}
+  else{const msg=`Let us look at ${d.address}.\n\nEnter the numbers in the Analyzer on the right and I will give you a personalized verdict. Or tell me what you already know about this deal.`;addMsg('ai',msg);chatHistory.push({role:'assistant',content:msg});}
+}
+
+function azTab(mode,btn){
+  azMode=mode;
+  document.querySelectorAll('.az-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('az-basic').style.display=mode==='basic'?'block':'none';
+  document.getElementById('az-brrrr').style.display=mode==='brrrr'?'block':'none';
+}
+
+async function runAnalysis(){
+  if(!activeDeal){alert('Select or create a deal first.');return;}
+  const btn=document.getElementById('azbtn');
+  btn.disabled=true;btn.textContent='Analyzing...';
+  let cf,coc,capRate,grm,dscr,inputs={},extra='';
+  if(azMode==='basic'){
+    const price=+document.getElementById('price').value||0,dpct=+document.getElementById('dpct').value||20,rate=+document.getElementById('irate').value||7,term=+document.getElementById('term').value||30,rent=+document.getElementById('rent').value||0,vac=+document.getElementById('vac').value||8,tax=+document.getElementById('tax').value||0,ins=+document.getElementById('ins').value||0,maint=+document.getElementById('maint').value||0,mgmtP=+document.getElementById('mgmt').value||8;
+    const down=price*(dpct/100),loan=price-down,mr=(rate/100)/12,n=term*12;
+    const mort=mr>0?loan*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1):loan/n;
+    const effRent=rent*(1-vac/100),mgmt=effRent*(mgmtP/100),exp=mort+(tax/12)+ins+maint+mgmt;
+    cf=effRent-exp;const noi=(effRent-(tax/12)-ins-maint-mgmt)*12;
+    capRate=price>0?(noi/price)*100:0;coc=down>0?(cf*12/down)*100:0;grm=rent>0?price/(rent*12):0;dscr=mort>0?(effRent-((tax/12)+ins+maint+mgmt))/mort:0;
+    inputs={price,dpct,irate:rate,term,rent,vac,tax,ins,maint,mgmt:mgmtP};
+    extra=`Mortgage $${Math.round(mort).toLocaleString()}/mo, Effective rent $${Math.round(effRent).toLocaleString()}/mo, Total expenses $${Math.round(exp).toLocaleString()}/mo`;
+  }else{
+    const bp=+document.getElementById('b-price').value||0,rh=+document.getElementById('rehab').value||0,arv=+document.getElementById('arv').value||0,ltv=+document.getElementById('ltv').value||75,rr=+document.getElementById('refi-rate').value||7,br=+document.getElementById('b-rent').value||0,be=+document.getElementById('b-exp').value||0;
+    const allIn=bp+rh,refiLoan=arv*(ltv/100),cashLeft=allIn-refiLoan,mr=(rr/100)/12,n=30*12;
+    const mort=mr>0?refiLoan*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1):refiLoan/n;
+    cf=br-mort-be;coc=cashLeft>0?(cf*12/cashLeft)*100:cashLeft<=0?999:0;capRate=allIn>0?((br-be)*12/allIn)*100:0;grm=br>0?allIn/(br*12):0;dscr=mort>0?(br-be)/mort:0;
+    inputs={mode:'brrrr',bp,rehab:rh,arv,ltv,refiRate:rr,rent:br,exp:be};
+    extra=`All-in $${allIn.toLocaleString()}, Refi loan $${Math.round(refiLoan).toLocaleString()}, Cash left in deal $${Math.round(cashLeft).toLocaleString()}`;
+  }
+  document.getElementById('az-results').style.display='flex';
+  document.getElementById('az-results').innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0;font-style:italic">Getting your personalized verdict...</div>';
+  const addr=deals[activeDeal]?.address||'this property',g=ans.goal?.t||'investing',bl=ans.blocker?.t||'',b=ans.budget?.t||'';
+  const prompt=`Analyze this ${azMode==='brrrr'?'BRRRR':'buy-and-hold'} deal at "${addr}" for an investor: goal "${g}", budget "${b}", blocker "${bl}".\nMetrics: Cash flow $${Math.round(cf).toLocaleString()}/mo, Cap rate ${capRate.toFixed(1)}%, CoC ${coc===999?'infinite':coc.toFixed(1)+'%'}, GRM ${grm.toFixed(1)}x, DSCR ${dscr.toFixed(2)}. ${extra}\nRespond ONLY with valid JSON, no markdown:\n{"tier":"STRONG","verdict":"2-3 sentence verdict","pros":["pro 1","pro 2","pro 3"],"cons":["risk 1","risk 2","risk 3"],"nextSteps":["action 1","action 2","action 3"]}\nTier must be exactly: STRONG, MAYBE, WEAK, or PASS`;
+  let tier='MAYBE',verdict='Analysis complete.',pros=[],cons=[],nextSteps=[];
+  try{
+    const txt=await callClaude([{role:'user',content:prompt}],600);
+    const parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    tier=parsed.tier||'MAYBE';verdict=parsed.verdict||'';pros=parsed.pros||[];cons=parsed.cons||[];nextSteps=parsed.nextSteps||[];
+  }catch(e){verdict='Numbers calculated successfully. Ask your coach for a detailed analysis.';}
+  const dealData={...deals[activeDeal],inputs,cf,coc,capRate,grm,dscr,tier,verdict,pros,cons,nextSteps};
+  deals[activeDeal]=dealData;saveDeals();renderSb();renderResults(dealData);
+  const coachMsg=`Numbers are in for ${deals[activeDeal].address}.\n\nVerdict: ${tier}. Cash flow is $${Math.round(cf).toLocaleString()}/mo with a ${capRate.toFixed(1)}% cap rate and ${dscr.toFixed(2)} DSCR.\n\n${verdict}\n\nWhat questions do you have about this deal?`;
+  addMsg('ai',coachMsg);chatHistory.push({role:'assistant',content:coachMsg});saveDealChat();
+  btn.disabled=false;btn.textContent='Analyze This Deal →';
+}
+
+function renderResults(d){
+  const el=document.getElementById('az-results');
+  el.style.display='flex';el.style.flexDirection='column';el.style.gap='8px';
+  const gc=(v,g,w)=>v>=g?'good':v>=w?'warn':'bad';
+  const tierCls=(d.tier||'MAYBE').toLowerCase();
+  el.innerHTML=`
+    <div class="divider"></div>
+    <div class="flbl">Key Metrics</div>
+    <div class="metrics">
+      <div class="metric ${gc(d.cf,200,0)}"><div class="mlbl">Cash flow/mo</div><div class="mval ${gc(d.cf,200,0)}">$${Math.round(d.cf||0).toLocaleString()}</div></div>
+      <div class="metric ${gc(d.coc===999?20:d.coc||0,8,4)}"><div class="mlbl">Cash-on-cash</div><div class="mval ${gc(d.coc===999?20:d.coc||0,8,4)}">${d.coc===999?'∞%':(d.coc||0).toFixed(1)+'%'}</div></div>
+      <div class="metric ${gc(d.capRate||0,6,4)}"><div class="mlbl">Cap rate</div><div class="mval ${gc(d.capRate||0,6,4)}">${(d.capRate||0).toFixed(1)}%</div></div>
+      <div class="metric ${(d.grm||0)<12?'good':(d.grm||0)<16?'warn':'bad'}"><div class="mlbl">GRM</div><div class="mval ${(d.grm||0)<12?'good':(d.grm||0)<16?'warn':'bad'}">${(d.grm||0).toFixed(1)}x</div></div>
+      <div class="metric ${gc(d.dscr||0,1.25,1.0)}"><div class="mlbl">DSCR</div><div class="mval ${gc(d.dscr||0,1.25,1.0)}">${(d.dscr||0).toFixed(2)}</div></div>
+    </div>
+    <div class="tier-badge ${tierCls}">${tierCls==='strong'?'✓ ':tierCls==='pass'?'✗ ':''}${(d.tier||'ANALYZING')}</div>
+    ${d.pros?.length?`<div class="flbl">Why it works</div><div class="reasons">${d.pros.map(p=>`<div class="reason"><div class="rdot pro"></div><span>${p}</span></div>`).join('')}</div>`:''}
+    ${d.cons?.length?`<div class="flbl">Risks to watch</div><div class="reasons">${d.cons.map(c=>`<div class="reason"><div class="rdot con"></div><span>${c}</span></div>`).join('')}</div>`:''}
+    ${d.nextSteps?.length?`<div class="next-steps"><div class="ns-lbl">Your next steps</div>${d.nextSteps.map(n=>`<div class="ns-item"><span>→</span><span>${n}</span></div>`).join('')}</div>`:''}`;
+}
+
+function addMsg(role,text,silent){
+  const msgs=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='bw '+(role==='user'?'me':'ai');
+  const b=document.createElement('div');b.className='bubble';b.textContent=text;
+  d.appendChild(b);msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  if(!silent&&activeDeal)saveDealChat();
+}
+
+function addTyping(){
+  const msgs=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='bw ai';d.id='typing';
+  d.innerHTML='<div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function saveDealChat(){
+  if(!activeDeal)return;
+  deals[activeDeal].chat=chatHistory;saveDeals();
+}
+
+async function doChat(text){
+  addMsg('user',text);chatHistory.push({role:'user',content:text});addTyping();
+  try{
+    const reply=await callClaude(chatHistory);
+    document.getElementById('typing')?.remove();
+    addMsg('ai',reply);chatHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    document.getElementById('typing')?.remove();
+    let msg='Something went wrong. Please try again.';
+    if(e.toString().includes('401'))msg='Invalid API key. Please restart the app and re-enter your key.';
+    else if(e.toString().includes('429'))msg='Too many requests. Wait a moment and try again.';
+    addMsg('ai',msg);
+  }
+}
+
+function send(){
+  const input=document.getElementById('mi');
+  const text=input.value.trim();
+  if(!text)return;
+  input.value='';doChat(text);
+}
+
+function clearAllData(){
+  if(confirm('This will clear your API key, profile, and all saved deals. Are you sure?')){
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+(function init(){
+  API_KEY=localStorage.getItem('cs_key')||'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';
+  const profile=localStorage.getItem('cs_profile');
+  if(profile){
+    try{ans=JSON.parse(profile);}catch(e){ans={};}
+    ['n-coach','n-roadmap','n-analyzer'].forEach(id=>document.getElementById(id).classList.add('live'));
+    document.getElementById('c-pill').textContent=`${ans.stage?.t||''} · ${ans.goal?.t||''} · ${ans.budget?.t||''}`;
+    sysPrompt=buildSystem();setSugs();renderSbFoot();loadDeals();showPage('coach');
+    const opening=buildOpening();
+    addMsg('ai',opening);chatHistory.push({role:'assistant',content:opening});
+  }else{showPage('ob');renderQ();}
+})();
+</script>
+</body>
+</html>
